@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>DevStudio Elite</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'Fira Code', 'monospace'],
+                    },
+                    colors: {
+                        dark: { 
+                            bg: '#09090b', 
+                            panel: '#18181b', 
+                            surface: '#27272a', 
+                            border: '#3f3f46', 
+                            text: '#e4e4e7',
+                            accent: '#3b82f6'
+                        },
+                        light: { 
+                            bg: '#f8fafc', 
+                            panel: '#ffffff', 
+                            surface: '#f1f5f9', 
+                            border: '#e2e8f0', 
+                            text: '#334155',
+                            accent: '#0ea5e9'
+                        }
+                    },
+                    animation: {
+                        'pulse-fast': 'pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'bounce-slow': 'bounce 3s infinite',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- CodeMirror & Addons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/dracula.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/ttcn.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/fold/foldgutter.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/dialog/dialog.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/scroll/simplescrollbars.min.css">
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- External Libs -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.14.7/beautify-html.min.js"></script>
+
+    <!-- CodeMirror Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/htmlmixed/htmlmixed.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/xml/xml.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/javascript/javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/css/css.min.js"></script>
+    
+    <!-- CodeMirror Addons -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/edit/closetag.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/edit/closebrackets.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/fold/foldcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/fold/foldgutter.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/fold/xml-fold.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/search/search.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/search/searchcursor.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/dialog/dialog.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/comment/comment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/keymap/sublime.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/scroll/simplescrollbars.min.js"></script>
+    
+    <!-- Emmet Support -->
+    <script src="https://emmet.io/js/browser-script.js"></script>
+
+    <style>
+        :root {
+            --bg-body: #09090b;
+            --bg-panel: #18181b;
+            --bg-header: #09090b;
+            --border-color: #27272a;
+            --text-main: #e4e4e7;
+            --text-muted: #a1a1aa;
+            --accent: #3b82f6;
+            --tab-active-bg: #18181b;
+            --tab-inactive-bg: #09090b;
+        }
+        
+        :root.light-theme {
+            --bg-body: #f8fafc;
+            --bg-panel: #ffffff;
+            --bg-header: #f1f5f9;
+            --border-color: #e2e8f0;
+            --text-main: #334155;
+            --text-muted: #64748b;
+            --accent: #0ea5e9;
+            --tab-active-bg: #ffffff;
+            --tab-inactive-bg: #f1f5f9;
+        }
+
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-body); color: var(--text-main); transition: background-color 0.3s, color 0.3s; }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; border: 2px solid transparent; background-clip: content-box; }
+        ::-webkit-scrollbar-thumb:hover { background-color: var(--text-muted); }
+
+        /* CodeMirror Overrides */
+        .CodeMirror { height: 100%; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.6; background-color: var(--bg-panel) !important; transition: background 0.3s; border: none; }
+        .CodeMirror-gutters { background-color: var(--bg-panel) !important; border-right: 1px solid var(--border-color) !important; }
+        .CodeMirror-linenumber { color: var(--text-muted) !important; opacity: 0.5; }
+        
+        /* Light Theme Specific CodeMirror Tweaks */
+        .light-theme .CodeMirror { color: #334155; }
+        
+        /* Tab Styling */
+        .tab-item { 
+            position: relative; 
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); 
+            user-select: none; 
+            border-right: 1px solid var(--border-color);
+            background-color: var(--tab-inactive-bg);
+            color: var(--text-muted);
+        }
+        .tab-item.active { 
+            background-color: var(--tab-active-bg); 
+            color: var(--accent); 
+            border-top: 2px solid var(--accent);
+            font-weight: 500;
+        }
+        .tab-item:not(.active):hover { 
+            background-color: rgba(125,125,125,0.1); 
+            color: var(--text-main); 
+        }
+        
+        /* Dragging Visuals */
+        .tab-item.dragging { opacity: 0.5; border: 2px dashed var(--accent); }
+
+        /* Loader */
+        .loader { height: 2px; width: 100%; background: transparent; overflow: hidden; position: absolute; top: 0; left: 0; z-index: 50; display: none; }
+        .loader .bar { width: 100%; height: 100%; background: var(--accent); transform: translateX(-100%); animation: load 1.5s infinite ease-in-out; }
+        @keyframes load { 0% { transform: translateX(-100%); } 50% { transform: translateX(0); } 100% { transform: translateX(100%); } }
+
+        /* Utilities */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Tooltip Arrow */
+        .tooltip-arrow::before {
+            content: "";
+            position: absolute;
+            top: -4px;
+            right: 14px;
+            width: 8px;
+            height: 8px;
+            background: inherit;
+            transform: rotate(45deg);
+            border-top: 1px solid var(--border-color);
+            border-left: 1px solid var(--border-color);
+        }
+
+        /* Animated Cross SVG Styles */
+        .cross-svg path {
+            stroke-dasharray: 100;
+            stroke-dashoffset: 100;
+            animation: draw-cross 0.6s ease-out forwards;
+        }
+        .cross-svg path:nth-child(2) {
+            animation-delay: 0.3s;
+        }
+        .cross-container {
+            animation: shake 3s ease-in-out infinite;
+        }
+
+        @keyframes draw-cross {
+            to { stroke-dashoffset: 0; }
+        }
+        @keyframes shake {
+            0%, 100% { transform: rotate(0deg); }
+            5% { transform: rotate(10deg); }
+            10% { transform: rotate(-10deg); }
+            15% { transform: rotate(5deg); }
+            20% { transform: rotate(-5deg); }
+            25% { transform: rotate(0deg); }
+        }
+
+        /* White Screen Animation */
+        .white-screen-overlay {
+            position: fixed;
+            inset: 0;
+            background: white;
+            z-index: 9999;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 1.5s ease-in-out;
+        }
+        .white-screen-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+    </style>
+</head>
+<body class="h-full flex flex-col overflow-hidden text-sm selection:bg-blue-500/30">
+
+    <!-- Compatibility Popup -->
+    <div id="mobilePopup" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-6">
+        <div class="bg-[#18181b] border border-red-500/30 rounded-2xl shadow-2xl max-w-sm w-full overflow-hidden transform transition-all duration-300 scale-100">
+            <div class="p-6 relative">
+                <div class="flex items-start gap-5">
+                    <!-- Animated Cross -->
+                    <div class="cross-container shrink-0 w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center border border-red-500/20 shadow-lg shadow-red-500/10">
+                        <svg class="cross-svg w-6 h-6 text-red-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M18 6L6 18"></path>
+                            <path d="M6 6l12 12"></path>
+                        </svg>
+                    </div>
+                    
+                    <div class="flex-grow">
+                        <h2 class="text-xl font-bold text-white mb-2 tracking-tight">Compatibility Error</h2>
+                        <p class="text-slate-400 text-sm leading-relaxed">This website is built for PC(s) only, not for phone or tablets.</p>
+                    </div>
+                </div>
+
+                <div class="mt-8 flex gap-3">
+                    <button onclick="window.compatibility.continue()" class="flex-1 bg-white/5 hover:bg-white/10 text-white py-2.5 rounded-xl font-medium transition active:scale-95 border border-white/10">
+                        Continue
+                    </button>
+                    <button onclick="window.compatibility.report()" class="flex-1 bg-red-600 hover:bg-red-500 text-white py-2.5 rounded-xl font-medium transition active:scale-95 shadow-lg shadow-red-600/20">
+                        Report
+                    </button>
+                </div>
+            </div>
+            <!-- Striped Danger Bar at bottom -->
+            <div class="h-1.5 w-full bg-[repeating-linear-gradient(45deg,#ef4444,#ef4444_10px,#b91c1c_10px,#b91c1c_20px)]"></div>
+        </div>
+    </div>
+
+    <!-- White Screen Overlay -->
+    <div id="whiteScreen" class="white-screen-overlay"></div>
+
+    <!-- HEADER -->
+    <header class="h-12 shrink-0 flex items-center justify-between border-b z-20 transition-colors duration-300 relative select-none" style="background-color: var(--bg-header); border-color: var(--border-color);">
+        
+        <!-- Brand -->
+        <div class="flex items-center gap-3 px-4 w-48 shrink-0">
+            <div class="bg-blue-500/10 p-1.5 rounded-lg border border-blue-500/20">
+                <i data-lucide="zap" class="text-blue-500 w-4 h-4"></i>
+            </div>
+            <span class="font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-cyan-400">DevStudio</span>
+        </div>
+
+        <!-- Tabs -->
+        <div class="flex-grow flex items-end h-full overflow-x-auto no-scrollbar mask-gradient" id="tabContainer">
+            <!-- Tabs injected by JS -->
+        </div>
+
+        <!-- Add Tab Button -->
+        <button onclick="window.tabManager.addTab()" class="h-full px-3 hover:bg-white/5 transition text-muted-foreground hover:text-blue-500 flex items-center justify-center border-l border-r border-transparent hover:border-white/5" title="New File (Ctrl+N)">
+            <i data-lucide="plus" class="w-4 h-4"></i>
+        </button>
+
+        <!-- Right Actions -->
+        <div class="flex items-center gap-1 px-3 shrink-0">
+            
+            <button onclick="window.actions.download()" class="hidden md:flex p-2 rounded hover:bg-white/10 text-muted-foreground hover:text-blue-400 transition" title="Download HTML">
+                <i data-lucide="download" class="w-4 h-4"></i>
+            </button>
+
+            <!-- Auto-Run Toggle -->
+            <label class="flex items-center gap-2 cursor-pointer group px-2">
+                <div class="relative">
+                    <input type="checkbox" id="autoRunToggle" class="sr-only" checked>
+                    <div class="block w-8 h-5 bg-slate-700/50 rounded-full transition-colors group-hover:bg-slate-600 peer-checked:bg-blue-600/80"></div>
+                    <div class="dot absolute left-1 top-1 bg-white w-3 h-3 rounded-full transition-transform duration-300 ease-in-out"></div>
+                </div>
+                <span class="text-[10px] font-bold uppercase tracking-wider opacity-50 group-hover:opacity-100 transition">Live</span>
+            </label>
+
+            <!-- Settings Menu -->
+            <div class="relative ml-2">
+                <button onclick="window.ui.toggleMenu()" class="p-2 rounded-lg hover:bg-white/10 transition text-muted-foreground" id="menuBtn">
+                    <i data-lucide="more-vertical" class="w-4 h-4"></i>
+                </button>
+                
+                <!-- Dropdown -->
+                <div id="dropdownMenu" class="hidden absolute right-0 mt-2 w-56 bg-white dark:bg-[#18181b] rounded-lg shadow-xl border border-slate-200 dark:border-slate-700 py-1 z-50 transform origin-top-right transition-all duration-200 tooltip-arrow">
+                    <div class="px-4 py-2 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Settings</div>
+                    
+                    <button onclick="window.ui.toggleTheme()" class="w-full text-left px-4 py-2 hover:bg-slate-100 dark:hover:bg-white/5 flex items-center gap-2">
+                        <i id="themeIcon" data-lucide="sun" class="w-4 h-4"></i> <span id="themeText">Light Mode</span>
+                    </button>
+                    
+                    <button onclick="window.actions.format()" class="w-full text-left px-4 py-2 hover:bg-slate-100 dark:hover:bg-white/5 flex items-center gap-2">
+                        <i data-lucide="wand-2" class="w-4 h-4"></i> Beautify Code
+                    </button>
+
+                    <!-- New Report Button in Menu -->
+                    <button onclick="window.compatibility.report()" class="w-full text-left px-4 py-2 hover:bg-slate-100 dark:hover:bg-white/5 flex items-center gap-2 text-orange-500 hover:text-orange-600">
+                        <i data-lucide="flag" class="w-4 h-4"></i> Report Issue
+                    </button>
+
+                    <div class="h-px bg-slate-200 dark:bg-slate-700 my-1"></div>
+                    
+                    <button onclick="window.actions.reset()" class="w-full text-left px-4 py-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-2">
+                        <i data-lucide="trash-2" class="w-4 h-4"></i> Factory Reset
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN LAYOUT -->
+    <main class="flex-grow flex flex-col md:flex-row overflow-hidden relative">
+        
+        <!-- EDITOR -->
+        <div class="flex flex-col h-1/2 md:h-full md:w-1/2 border-b md:border-b-0 md:border-r transition-colors duration-300 relative z-0" style="border-color: var(--border-color);">
+            <div class="flex-grow relative overflow-hidden">
+                <textarea id="codeEditor"></textarea>
+            </div>
+            
+            <!-- Status Bar -->
+            <div class="px-3 h-6 flex items-center justify-between text-[10px] select-none font-mono transition-colors duration-300" style="background-color: var(--bg-body); color: var(--text-muted); border-top: 1px solid var(--border-color);">
+                <div class="flex items-center gap-4">
+                    <span id="cursorPos" class="flex items-center gap-1"><i data-lucide="move" class="w-3 h-3"></i> Ln 1, Col 1</span>
+                    <span id="selectionInfo" class="hidden"></span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span id="saveStatus" class="text-blue-500 hidden">Saved</span>
+                    <span>HTML Mixed</span>
+                    <span id="docSize">0 B</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- PREVIEW -->
+        <div class="flex flex-col h-1/2 md:h-full md:w-1/2 relative z-0 bg-slate-50 dark:bg-[#0c0c0e]">
+            
+            <!-- Browser Toolbar -->
+            <div class="h-9 px-2 flex items-center gap-2 shadow-sm border-b transition-colors duration-300 z-10 shrink-0" style="background-color: var(--bg-panel); border-color: var(--border-color);">
+                <button onclick="window.browser.refresh()" class="p-1.5 rounded-md hover:bg-slate-200 dark:hover:bg-white/10 text-slate-500 transition">
+                    <i data-lucide="rotate-cw" class="w-3.5 h-3.5"></i>
+                </button>
+
+                <div class="flex-grow relative group">
+                    <div class="absolute inset-y-0 left-0 pl-2 flex items-center pointer-events-none">
+                        <i id="lockIcon" data-lucide="lock" class="w-3 h-3 text-emerald-500"></i>
+                    </div>
+                    <input type="text" id="addressBar" value="localhost:3000" 
+                        class="w-full h-6 bg-slate-100 dark:bg-black/30 text-slate-600 dark:text-slate-400 text-xs pl-7 pr-3 rounded border border-transparent focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none transition font-mono"
+                        placeholder="Enter URL...">
+                </div>
+
+                <div class="flex bg-slate-200 dark:bg-white/5 rounded p-0.5 shrink-0">
+                    <button onclick="window.actions.resizeView('100%')" class="p-1 rounded bg-white dark:bg-white/10 shadow-sm text-slate-700 dark:text-slate-200" title="Desktop">
+                        <i data-lucide="monitor" class="w-3 h-3"></i>
+                    </button>
+                    <button onclick="window.actions.resizeView('375px')" class="p-1 rounded hover:bg-white dark:hover:bg-white/10 text-slate-500 transition" title="Mobile">
+                        <i data-lucide="smartphone" class="w-3 h-3"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div id="loader" class="loader"><div class="bar"></div></div>
+
+            <!-- Iframe Container -->
+            <div class="flex-grow relative w-full overflow-hidden flex justify-center items-start bg-grid-pattern">
+                <iframe id="previewFrame" class="bg-white shadow-2xl transition-all duration-300 origin-top h-full w-full" sandbox="allow-scripts allow-same-origin allow-popups allow-modals allow-forms"></iframe>
+                
+                <!-- External Warning -->
+                <div id="externalOverlay" class="hidden absolute inset-0 flex flex-col items-center justify-center bg-white/95 dark:bg-[#09090b]/95 backdrop-blur z-20 text-center p-6">
+                    <div class="bg-blue-500/10 p-4 rounded-full mb-4 animate-bounce"><i data-lucide="globe" class="w-8 h-8 text-blue-500"></i></div>
+                    <h3 class="font-bold text-slate-800 dark:text-white mb-2 text-lg">External Context</h3>
+                    <p class="text-sm max-w-xs mb-6 text-slate-500">Live editing is disabled for security reasons while browsing external websites.</p>
+                    <button onclick="window.browser.navigate('internal')" class="bg-blue-600 text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-blue-500 shadow-lg shadow-blue-500/20 transition hover:scale-105 active:scale-95">
+                        Return to Editor
+                    </button>
+                </div>
+            </div>
+
+            <!-- Console Drawer -->
+            <div id="consoleContainer" class="absolute bottom-0 left-0 right-0 max-h-[40%] bg-[#09090b]/95 backdrop-blur text-slate-300 flex flex-col transition-transform duration-300 transform translate-y-full z-30 border-t border-slate-700 shadow-[0_-4px_20px_rgba(0,0,0,0.5)]">
+                <div class="flex items-center justify-between px-3 py-1.5 bg-[#18181b] border-b border-slate-700 cursor-ns-resize" title="Console">
+                    <div class="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                        <i data-lucide="terminal" class="w-3 h-3"></i> Terminal
+                    </div>
+                    <div class="flex gap-1">
+                        <button onclick="window.actions.clearConsole()" class="p-1 hover:bg-white/10 rounded text-slate-400 hover:text-white transition" title="Clear"><i data-lucide="ban" class="w-3 h-3"></i></button>
+                        <button onclick="window.ui.toggleConsole()" class="p-1 hover:bg-white/10 rounded text-slate-400 hover:text-white transition" title="Close"><i data-lucide="chevron-down" class="w-3 h-3"></i></button>
+                    </div>
+                </div>
+                <div id="consoleOutput" class="flex-grow overflow-y-auto font-mono text-xs p-2 space-y-1"></div>
+            </div>
+            
+            <!-- Console Toggle Fab -->
+            <button id="consoleToggleBtn" onclick="window.ui.toggleConsole()" class="absolute bottom-4 right-4 bg-[#18181b] border border-slate-700 text-slate-300 p-2.5 rounded-full shadow-lg hover:bg-blue-600 hover:text-white hover:border-blue-500 transition z-20 hover:scale-110 active:scale-95 group">
+                <i data-lucide="terminal" class="w-4 h-4"></i>
+                <span id="errorBadge" class="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center hidden shadow-sm">0</span>
+            </button>
+        </div>
+    </main>
+
+    <script>
+        // --- CORE UTILS ---
+        const $ = id => document.getElementById(id);
+        const uuid = () => Date.now().toString(36) + Math.random().toString(36).substr(2);
+        
+        // --- COMPATIBILITY CHECK ---
+        const compatibility = {
+            check: () => {
+                // STRICT OS DETECTION (No screen resolution checks)
+                // 1. Standard Mobile UAs (Android, iPhone, generic Mobile)
+                const isMobileUA = /Android|webOS|iPhone|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+                
+                // 2. iPadOS (Often reports as Macintosh but has touch points)
+                // We treat iPad as "Tablet/Phone" category to be blocked, distinct from Mac OS PC.
+                const isIPad = (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1) || /iPad/i.test(navigator.userAgent);
+
+                if (isMobileUA || isIPad) {
+                    const popup = $('mobilePopup');
+                    popup.classList.remove('hidden');
+                    // Add entrance animation
+                    popup.querySelector('div').classList.add('scale-100');
+                    popup.querySelector('div').classList.remove('scale-95', 'opacity-0');
+                }
+            },
+            
+            continue: () => {
+                const popup = $('mobilePopup');
+                const whiteScreen = $('whiteScreen');
+                
+                // Animate popup closing
+                popup.querySelector('div').style.transform = "scale(0.9)";
+                popup.querySelector('div').style.opacity = "0";
+                
+                // Fade in white screen immediately after
+                setTimeout(() => {
+                    whiteScreen.classList.add('active');
+                }, 200);
+
+                // Optional: Remove everything else from DOM to save memory/prevent interaction
+                setTimeout(() => {
+                    document.body.innerHTML = '';
+                    document.body.appendChild(whiteScreen);
+                }, 1600);
+            },
+
+            report: () => {
+                window.open('https://forms.gle/mr8NFQP6jAfmg6rp7', '_blank');
+            }
+        };
+
+        // --- STATE ---
+        const state = {
+            theme: 'dark',
+            files: [],
+            activeFileId: null,
+            autoRun: true,
+            errorCount: 0
+        };
+
+        const defaultTemplate = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevStudio Project</title>
+    <script src="https://cdn.tailwindcss.com"><\/script>
+    <style>
+        body { 
+            display: grid; 
+            place-items: center; 
+            min-height: 100vh; 
+            background: linear-gradient(135deg, #1e293b, #0f172a); 
+            color: white; 
+            font-family: sans-serif;
+            margin: 0;
+        }
+        .card {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
+            padding: 2rem;
+            border-radius: 1rem;
+            border: 1px solid rgba(255,255,255,0.1);
+            text-align: center;
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.2);
+            transform: translateY(0);
+            transition: all 0.3s;
+        }
+        .card:hover { transform: translateY(-5px); border-color: rgba(59, 130, 246, 0.5); }
+        button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            margin-top: 1.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        button:hover { background: #2563eb; transform: scale(1.05); }
+        button:active { transform: scale(0.95); }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1 class="text-4xl font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-cyan-400">Hello World</h1>
+        <p class="text-slate-400">Edit this code to see changes instantly.</p>
+        <button onclick="confettiEffect()">Click Me!</button>
+    </div>
+
+    <script>
+        function confettiEffect() {
+            const btn = document.querySelector('button');
+            btn.textContent = 'Awesome! 🎉';
+            setTimeout(() => btn.textContent = 'Click Me!', 2000);
+            console.log("Interaction detected!");
+        }
+    <\/script>
+</body>
+</html>`;
+
+        // --- EDITOR CONFIG ---
+        const editor = CodeMirror.fromTextArea($('codeEditor'), {
+            mode: "htmlmixed",
+            theme: "dracula",
+            lineNumbers: true,
+            autoCloseTags: true,
+            autoCloseBrackets: true,
+            matchBrackets: true,
+            styleActiveLine: true,
+            lineWrapping: true,
+            foldGutter: true,
+            gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
+            keyMap: "sublime",
+            indentUnit: 4,
+            indentWithTabs: true,
+            scrollbarStyle: "simple",
+            extraKeys: {
+                "Ctrl-Space": "autocomplete",
+                "Ctrl-Q": (cm) => cm.foldCode(cm.getCursor()),
+                "Ctrl-S": () => { updatePreview(); showSaveStatus(); },
+                "Cmd-S": () => { updatePreview(); showSaveStatus(); }
+            }
+        });
+
+        // --- TAB MANAGER PRO (With Drag & Drop) ---
+        const tabManager = {
+            init: () => {
+                const saved = localStorage.getItem('dsp_files_v2');
+                if (saved) {
+                    try { state.files = JSON.parse(saved); } catch(e) { state.files = []; }
+                }
+                
+                if (state.files.length === 0) {
+                    tabManager.addTab('index.html', defaultTemplate);
+                } else {
+                    const lastActive = localStorage.getItem('dsp_active_id_v2');
+                    const exists = state.files.find(f => f.id === lastActive);
+                    tabManager.switchTab(exists ? exists.id : state.files[0].id);
+                }
+                tabManager.render();
+            },
+
+            addTab: (name, content = defaultTemplate) => {
+                const id = uuid();
+                const title = name || `page_${state.files.length + 1}.html`;
+                state.files.push({ id, title, content });
+                tabManager.switchTab(id);
+                tabManager.render();
+                return id;
+            },
+
+            closeTab: (e, id) => {
+                if(e) e.stopPropagation();
+                
+                if (state.files.length <= 1) {
+                    if(confirm("Reset file content?")) {
+                        state.files[0].content = defaultTemplate;
+                        editor.setValue(defaultTemplate);
+                        updatePreview();
+                    }
+                    return;
+                }
+
+                // FIXED: Better confirmation and logic
+                const idx = state.files.findIndex(f => f.id === id);
+                if(idx === -1) return;
+                
+                state.files.splice(idx, 1);
+                
+                if (id === state.activeFileId) {
+                    // Switch to nearest neighbor
+                    const nextFile = state.files[idx] || state.files[idx - 1];
+                    tabManager.switchTab(nextFile.id);
+                } else {
+                    tabManager.save();
+                    tabManager.render();
+                }
+            },
+
+            switchTab: (id) => {
+                // Save current before switching
+                if (state.activeFileId) {
+                    const current = state.files.find(f => f.id === state.activeFileId);
+                    if (current) current.content = editor.getValue();
+                }
+
+                const next = state.files.find(f => f.id === id);
+                if (next) {
+                    state.activeFileId = id;
+                    // Prevent loops
+                    if(editor.getValue() !== next.content) {
+                        editor.setValue(next.content);
+                        editor.clearHistory();
+                    }
+                    tabManager.save();
+                    tabManager.render();
+                    updatePreview(); 
+                    browser.navigate('internal');
+                }
+            },
+
+            save: () => {
+                const current = state.files.find(f => f.id === state.activeFileId);
+                if (current) current.content = editor.getValue();
+                localStorage.setItem('dsp_files_v2', JSON.stringify(state.files));
+                localStorage.setItem('dsp_active_id_v2', state.activeFileId);
+            },
+
+            renameTab: (id) => {
+                const file = state.files.find(f => f.id === id);
+                if (!file) return;
+                const newName = prompt("Rename File:", file.title);
+                if (newName && newName.trim()) {
+                    file.title = newName.trim();
+                    tabManager.save();
+                    tabManager.render();
+                }
+            },
+
+            reorder: (fromIndex, toIndex) => {
+                const element = state.files.splice(fromIndex, 1)[0];
+                state.files.splice(toIndex, 0, element);
+                tabManager.save();
+                tabManager.render();
+            },
+
+            render: () => {
+                const container = $('tabContainer');
+                container.innerHTML = '';
+                
+                state.files.forEach((file, index) => {
+                    const isActive = file.id === state.activeFileId;
+                    const div = document.createElement('div');
+                    
+                    // FIXED: Added 'group' for hover effects
+                    div.className = `group tab-item flex items-center gap-2 px-4 py-2.5 text-xs cursor-pointer min-w-[140px] max-w-[220px] shrink-0 border-r ${isActive ? 'active' : ''}`;
+                    div.draggable = true;
+                    
+                    // Drag Events
+                    div.ondragstart = (e) => { e.dataTransfer.setData('text/plain', index); div.classList.add('dragging'); };
+                    div.ondragend = () => div.classList.remove('dragging');
+                    div.ondragover = (e) => e.preventDefault();
+                    div.ondrop = (e) => {
+                        e.preventDefault();
+                        const fromIndex = parseInt(e.dataTransfer.getData('text/plain'));
+                        tabManager.reorder(fromIndex, index);
+                    };
+
+                    div.onclick = () => tabManager.switchTab(file.id);
+                    div.ondblclick = () => tabManager.renameTab(file.id);
+                    
+                    // FIXED: Close button logic with visible hover state
+                    div.innerHTML = `
+                        <div class="flex items-center gap-2 overflow-hidden flex-grow">
+                            <i data-lucide="file-code" class="w-3.5 h-3.5 opacity-70 shrink-0"></i>
+                            <span class="truncate">${file.title}</span>
+                        </div>
+                        <button onclick="window.tabManager.closeTab(event, '${file.id}')" 
+                                class="opacity-0 group-hover:opacity-100 p-1 rounded-md hover:bg-red-500/10 hover:text-red-500 transition-all shrink-0">
+                            <i data-lucide="x" class="w-3 h-3"></i>
+                        </button>
+                    `;
+                    container.appendChild(div);
+                });
+                lucide.createIcons();
+            }
+        };
+
+        // --- BROWSER ENGINE ---
+        const browser = {
+            mode: 'internal',
+            
+            navigate: (url) => {
+                const loader = $('loader');
+                loader.style.display = 'block';
+                setTimeout(() => loader.style.display = 'none', 800);
+
+                if (url === 'internal') {
+                    browser.mode = 'internal';
+                    $('externalOverlay').classList.add('hidden');
+                    $('addressBar').value = 'localhost:3000';
+                    $('lockIcon').setAttribute('data-lucide', 'lock');
+                    $('lockIcon').classList.replace('text-slate-400', 'text-emerald-500');
+                    lucide.createIcons();
+                    updatePreview();
+                } else {
+                    browser.mode = 'external';
+                    let validUrl = url.trim();
+                    if (!validUrl.startsWith('http')) validUrl = 'https://' + validUrl;
+                    
+                    $('addressBar').value = validUrl;
+                    $('lockIcon').setAttribute('data-lucide', 'globe');
+                    $('lockIcon').classList.replace('text-emerald-500', 'text-slate-400');
+                    lucide.createIcons();
+                    
+                    try {
+                        $('previewFrame').src = validUrl;
+                        $('externalOverlay').classList.remove('hidden');
+                    } catch (e) {
+                        console.error("Load failed");
+                    }
+                }
+            },
+
+            refresh: () => {
+                const url = $('addressBar').value;
+                // Add simple rotation animation
+                const icon = document.querySelector('[data-lucide="rotate-cw"]');
+                icon.classList.add('animate-spin');
+                setTimeout(() => icon.classList.remove('animate-spin'), 500);
+                
+                browser.navigate(url.includes('localhost') ? 'internal' : url);
+            }
+        };
+
+        function updatePreview() {
+            if (browser.mode !== 'internal') return;
+            
+            const code = editor.getValue();
+            
+            // Inject Console Interceptor
+            const injection = `
+                <script>
+                    (function(){
+                        const send = (type, args) => {
+                            try {
+                                const msg = args.map(a => {
+                                    if(typeof a === 'object') return JSON.stringify(a);
+                                    return String(a);
+                                }).join(' ');
+                                window.parent.postMessage({source: 'preview-console', type, msg}, '*');
+                            } catch(e) {}
+                        };
+                        ['log', 'error', 'warn', 'info'].forEach(method => {
+                            const original = console[method];
+                            console[method] = (...args) => {
+                                original.apply(console, args);
+                                send(method, args);
+                            };
+                        });
+                        window.onerror = (msg, url, line) => send('error', [msg + ' (Line: ' + line + ')']);
+                    })();
+                <\/script>
+            `;
+
+            let finalCode = code;
+            if (code.includes('<head>')) finalCode = code.replace('<head>', '<head>' + injection);
+            else if (code.includes('<body>')) finalCode = code.replace('<body>', '<body>' + injection);
+            else finalCode = injection + code;
+
+            $('previewFrame').srcdoc = finalCode;
+            $('docSize').innerText = new Blob([code]).size + ' B';
+            tabManager.save();
+        }
+
+        function showSaveStatus() {
+            const el = $('saveStatus');
+            el.classList.remove('hidden');
+            setTimeout(() => el.classList.add('hidden'), 2000);
+        }
+
+        // --- ACTIONS ---
+        const ui = {
+            toggleMenu: () => {
+                const menu = $('dropdownMenu');
+                menu.classList.toggle('hidden');
+            },
+
+            toggleTheme: () => {
+                const html = document.documentElement;
+                const isDark = html.classList.toggle('dark');
+                
+                if (!isDark) html.classList.add('light-theme'); 
+                else html.classList.remove('light-theme');
+                
+                state.theme = isDark ? 'dark' : 'light';
+                editor.setOption('theme', isDark ? 'dracula' : 'ttcn');
+                
+                $('themeText').innerText = isDark ? 'Light Mode' : 'Dark Mode';
+                $('themeIcon').setAttribute('data-lucide', isDark ? 'sun' : 'moon');
+                lucide.createIcons();
+                ui.toggleMenu();
+            },
+            
+            toggleConsole: () => {
+                const con = $('consoleContainer');
+                const btn = $('consoleToggleBtn');
+                const isOpen = !con.classList.contains('translate-y-full');
+                
+                if(isOpen) {
+                    con.classList.add('translate-y-full');
+                    btn.classList.remove('rotate-180');
+                    state.errorCount = 0; // Reset badge on close? Or keep?
+                    $('errorBadge').classList.add('hidden');
+                } else {
+                    con.classList.remove('translate-y-full');
+                    btn.classList.add('rotate-180');
+                }
+            }
+        };
+
+        const actions = {
+            download: () => {
+                const blob = new Blob([editor.getValue()], {type: 'text/html'});
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = state.files.find(f=>f.id===state.activeFileId).title;
+                a.click();
+                ui.toggleMenu();
+            },
+            
+            format: () => {
+                const formatted = html_beautify(editor.getValue(), { 
+                    indent_size: 4, 
+                    wrap_line_length: 80,
+                    preserve_newlines: true 
+                });
+                editor.setValue(formatted);
+                ui.toggleMenu();
+            },
+            
+            clearConsole: () => {
+                $('consoleOutput').innerHTML = '';
+                state.errorCount = 0;
+                $('errorBadge').classList.add('hidden');
+            },
+
+            resizeView: (width) => {
+                $('previewFrame').style.maxWidth = width;
+            },
+
+            // FIXED: Soft reset logic
+            reset: () => {
+                if(confirm("Factory reset? This will clear all projects and local storage.")) {
+                    localStorage.removeItem('dsp_files_v2');
+                    localStorage.removeItem('dsp_active_id_v2');
+                    state.files = [];
+                    state.activeFileId = null;
+                    tabManager.init();
+                    actions.clearConsole();
+                    alert("DevStudio Reset Successfully.");
+                }
+            }
+        };
+
+        // --- EXPOSE ---
+        window.tabManager = tabManager;
+        window.ui = ui;
+        window.actions = actions;
+        window.browser = browser;
+        window.compatibility = compatibility;
+
+        // --- LISTENERS ---
+        $('autoRunToggle').addEventListener('change', (e) => {
+            state.autoRun = e.target.checked;
+            const dot = e.target.nextElementSibling.nextElementSibling;
+            dot.style.transform = state.autoRun ? 'translateX(100%)' : 'translateX(0)';
+            if(state.autoRun) updatePreview();
+        });
+        // Set initial toggle visual
+        $('autoRunToggle').nextElementSibling.nextElementSibling.style.transform = 'translateX(100%)';
+
+        let debounceTimer;
+        editor.on('change', () => {
+            if (state.autoRun) {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(updatePreview, 800);
+            }
+        });
+
+        editor.on('cursorActivity', () => {
+            const pos = editor.getCursor();
+            const selection = editor.getSelection();
+            $('cursorPos').innerHTML = `<i data-lucide="move" class="w-3 h-3 inline"></i> Ln ${pos.line + 1}, Col ${pos.ch + 1}`;
+            lucide.createIcons();
+            
+            if(selection.length > 0) {
+                $('selectionInfo').innerText = `(${selection.length} chars)`;
+                $('selectionInfo').classList.remove('hidden');
+            } else {
+                $('selectionInfo').classList.add('hidden');
+            }
+        });
+
+        $('addressBar').addEventListener('keydown', (e) => {
+            if(e.key === 'Enter') browser.navigate(e.target.value);
+        });
+
+        window.addEventListener('message', (e) => {
+            if (e.data && e.data.source === 'preview-console') {
+                const { type, msg } = e.data;
+                const div = document.createElement('div');
+                div.className = `border-l-2 pl-2 py-1 break-words font-mono text-xs ${
+                    type === 'error' ? 'border-red-500 text-red-400 bg-red-900/10' : 
+                    type === 'warn' ? 'border-yellow-500 text-yellow-400 bg-yellow-900/10' : 'border-slate-600 text-slate-300'
+                }`;
+                div.innerHTML = `<span class="opacity-50 text-[10px] uppercase mr-2 font-bold">${type}</span>${msg}`;
+                $('consoleOutput').prepend(div);
+                
+                if(type === 'error') {
+                    state.errorCount++;
+                    const badge = $('errorBadge');
+                    badge.innerText = state.errorCount > 9 ? '9+' : state.errorCount;
+                    badge.classList.remove('hidden');
+                    
+                    // Auto-open on first error if desired, but user might find annoying
+                    // $('consoleContainer').classList.remove('translate-y-full'); 
+                }
+            }
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('#menuBtn') && !e.target.closest('#dropdownMenu')) {
+                $('dropdownMenu').classList.add('hidden');
+            }
+        });
+        
+        // Keyboard Shortcuts
+        document.addEventListener('keydown', (e) => {
+            // New Tab: Ctrl + Alt + N
+            if(e.ctrlKey && e.altKey && e.key === 'n') {
+                e.preventDefault();
+                tabManager.addTab();
+            }
+        });
+
+        // --- BOOTSTRAP ---
+        window.addEventListener('load', () => {
+            lucide.createIcons();
+            tabManager.init();
+            compatibility.check(); // Triggers the popup check
+        });
+
+    </script>
+</body>
+</html>
